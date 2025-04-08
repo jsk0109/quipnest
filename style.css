@@ -1,0 +1,85 @@
+body.dark-mode {
+    background: #1a202c;
+    color: #e2e8f0;
+}
+
+body.dark-mode .time-card,
+body.dark-mode .quote-box,
+body.dark-mode footer {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+.time-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.flipclock-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flipclock-digit {
+    background: black !important;
+    color: white !important;
+    font-size: 48px !important;
+}
+
+.flipclock-label {
+    color: white !important;
+}
+
+.flipclock-wrapper .flipclock-second .flipclock-digit {
+    font-size: 36px !important;
+    color: red !important;
+}
+
+.time-quote {
+    margin-top: 10px;
+}
+
+.quote-box {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.swiper-container {
+    height: 300px;
+    overflow: hidden;
+}
+
+.swiper-slide {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.sharethis-inline-share-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.sharethis-inline-share-buttons .st-btn {
+    transition: transform 0.3s;
+}
+
+.sharethis-inline-share-buttons .st-btn:hover {
+    transform: scale(1.1);
+}
+
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
