@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuipNest - Inspiring Quotes</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- FlipClock.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flipclock/0.7.8/flipclock.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flipclock/0.7.8/flipclock.min.js"></script>
+    <!-- Typed.js -->
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Swiper.js -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <!-- Darkmode.js -->
+    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+    <!-- ShareThis -->
+    <script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=your-sharethis-id&product=inline-share-buttons" async="async"></script>
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen text-gray-800">
+    <div id="particles-js" class="absolute inset-0 z-0"></div>
+    <div class="container mx-auto p-4 relative z-10">
+        <!-- 시간 카드 -->
+        <div class="time-card bg-black shadow-lg rounded-lg p-4 mb-8 mx-auto" style="aspect-ratio: 9/6; max-width: 900px;">
+            <div class="clock w-full h-[70%]"></div>
+            <div class="time-quote text-white text-center h-[30%] flex items-center justify-center">
+                <span id="time-quote" class="text-lg"></span>
+            </div>
+        </div>
+
+        <!-- 오늘의 명언 -->
+        <div class="today-quote-section text-center mb-8">
+            <h2 class="text-2xl font-bold mb-4">Today's Quote</h2>
+            <button id="today-quote-btn" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition">Show Today's Quote</button>
+            <div class="quote-box bg-white shadow-lg rounded-lg p-6 mt-4" data-aos="fade-in">
+                <p id="today-quote" class="text-xl">"Click the button to see today's quote!"</p>
+                <p id="today-author" class="text-gray-600 italic">— Unknown</p>
+                <div class="sharethis-inline-share-buttons mt-4"></div>
+            </div>
+        </div>
+
+        <!-- 지난 명언 슬라이드 -->
+        <div class="past-quotes-section text-center mb-8">
+            <h2 class="text-2xl font-bold mb-4">Past Quotes</h2>
+            <div class="swiper-container">
+                <div class="swiper-wrapper" id="past-quotes"></div>
+            </div>
+        </div>
+
+        <!-- 랜덤 명언 -->
+        <div class="random-quote-section text-center mb-8">
+            <h2 class="text-2xl font-bold mb-4">Random Quote</h2>
+            <div class="category-filter grid grid-cols-2 sm:grid-cols-5 gap-4 mb-4">
+                <button class="category-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 active:bg-blue-500 active:text-white" data-category="all">All</button>
+                <button class="category-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 active:bg-blue-500 active:text-white" data-category="love">Love</button>
+                <button class="category-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 active:bg-blue-500 active:text-white" data-category="motivation">Motivation</button>
+                <button class="category-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 active:bg-blue-500 active:text-white" data-category="success">Success</button>
+                <button class="category-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 active:bg-blue-500 active:text-white" data-category="wisdom">Wisdom</button>
+                <button class="category-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 active:bg-blue-500 active:text-white" data-category="happiness">Happiness</button>
+            </div>
+            <button id="random-quote-btn" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-600 transition">Generate Random Quote</button>
+            <div class="quote-box bg-white shadow-lg rounded-lg p-6 mt-4 hidden" id="random-quote-box" data-aos="fade-in">
+                <p id="random-quote" class="text-xl"></p>
+                <p id="random-author" class="text-gray-600 italic"></p>
+                <div class="sharethis-inline-share-buttons mt-4"></div>
+                <button id="unlimited-btn" class="bg-orange-500 text-white font-semibold py-2 px-4 rounded-lg mt-4 hover:bg-orange-600 transition hidden">Unlimited Generate ($1.98/mo)</button>
+            </div>
+            <p id="random-limit-message" class="text-red-500 font-bold mt-2 hidden">Tomorrow you can generate again!</p>
+        </div>
+
+        <!-- 프리미엄 기능 -->
+        <div class="premium-section text-center mb-8">
+            <button id="save-quote-btn" class="bg-orange-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-orange-600 transition">Save Quote</button>
+            <button id="download-image-btn" class="bg-orange-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-orange-600 transition">Download as Image ($0.99)</button>
+        </div>
+
+        <!-- 테마 변경 -->
+        <div class="theme-section text-center mb-8">
+            <label for="theme-select" class="mr-2">Choose Theme: </label>
+            <select id="theme-select" class="border rounded-lg p-2">
+                <option value="default">Default</option>
+                <option value="nature">Nature (Premium)</option>
+                <option value="space">Space (Premium)</option>
+            </select>
+        </div>
+
+        <!-- 피드백 섹션 -->
+        <div class="feedback-section text-center mb-8">
+            <h2 class="text-2xl font-bold mb-4">Feedback</h2>
+            <form id="feedback-form" class="max-w-md mx-auto">
+                <input type="text" name="name" placeholder="Your Name" class="w-full p-2 mb-4 border rounded-lg" required>
+                <input type="email" name="email" placeholder="Your Email" class="w-full p-2 mb-4 border rounded-lg" required>
+                <textarea name="message" placeholder="Your Feedback" class="w-full p-2 mb-4 border rounded-lg h-24" required></textarea>
+                <button type="submit" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition">Submit</button>
+            </form>
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="text-center p-4 bg-white rounded-lg shadow-lg">
+            <p>Contact: <a href="mailto:jsk0109@gmail.com" class="text-blue-500">jsk0109@gmail.com</a></p>
+            <p>Support QuipNest with a coffee!</p>
+            <a href="https://www.buymeacoffee.com/quipnest" target="_blank" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-600 transition">Buy Me a Coffee ($3)</a>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
