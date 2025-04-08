@@ -1,32 +1,21 @@
-// Particles.js
-particlesJS("particles-js", {
-    particles: {
-        number: { value: 80, density: { enable: true, value_area: 800 } },
-        color: { value: "#ffffff" },
-        shape: { type: "circle" },
-        opacity: { value: 0.5, random: false },
-        size: { value: 3, random: true },
-        line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
-        move: { enable: true, speed: 6, direction: "none", random: false }
-    },
-    interactivity: {
-        detect_on: "canvas",
-        events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" } },
-        modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
-    }
-});
-
 // AOS
 AOS.init();
 
-// Darkmode.js
-new Darkmode().showWidget();
+// 커스텀 시계
+function updateClock() {
+    const now = new Date();
+    const hours = now.getHours() % 12 || 12;
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
 
-// FlipClock.js
-const clock = new FlipClock(document.querySelector('.clock'), {
-    clockFace: 'TwentyFourHourClock',
-    showSeconds: true
-});
+    document.getElementById('hours').textContent = hours;
+    document.getElementById('minutes').textContent = minutes;
+    document.getElementById('seconds').textContent = seconds;
+    document.getElementById('ampm').textContent = ampm;
+}
+updateClock();
+setInterval(updateClock, 1000);
 
 // 시간 관련 명언 (하드코딩)
 const timeQuotes = [
@@ -42,118 +31,70 @@ const timeQuotes = [
     "The future is something which everyone reaches at the rate of sixty minutes an hour. — C.S. Lewis"
 ];
 
-// Typed.js로 시간 명언 랜덤 재생
-function displayTimeQuote() {
-    const randomQuote = timeQuotes[Math.floor(Math.random() * timeQuotes.length)];
-    const typed = new Typed('#time-quote', {
-        strings: [randomQuote],
-        typeSpeed: 50,
-        backSpeed: 50,
-        fadeOut: true,
-        loop: false
-    });
-}
-displayTimeQuote();
-setInterval(displayTimeQuote, 5000);
+// 시간 명언 표시
+const timeQuotesContainer = document.getElementById('time-quotes');
+timeQuotes.forEach((quote, index) => {
+    const quoteItem = document.createElement('div');
+    quoteItem.classList.add('quote-item');
+    quoteItem.textContent = quote;
+    quoteItem.style.animationDelay = `${index * 5}s`;
+    timeQuotesContainer.appendChild(quoteItem);
+});
 
-// 오늘의 명언
-document.getElementById('today-quote-btn').addEventListener('click', () => {
-    fetch('https://api.quotable.io/random?maxLength=45')
+// 오늘의 명언 (ZenQuotes API)
+function loadTodayQuote() {
+    const today = new Date().toDateString();
+    const storedDate = localStorage.getItem('quoteDate');
+    const storedQuote = localStorage.getItem('todayQuote');
+    const storedAuthor = localStorage.getItem('todayAuthor');
+
+    if (storedDate === today && storedQuote && storedAuthor) {
+        document.getElementById('today-quote').textContent = `"${storedQuote}"`;
+        document.getElementById('today-author').textContent = `— ${storedAuthor}`;
+        return;
+    }
+
+    fetch('https://zenquotes.io/api/today')
         .then(response => response.json())
         .then(data => {
-            const quoteElement = document.getElementById('today-quote');
-            const authorElement = document.getElementById('today-author');
-            quoteElement.textContent = `"${data.content}"`;
-            authorElement.textContent = `— ${data.author}`;
-            anime({
-                targets: quoteElement,
-                opacity: [0, 1],
-                duration: 1000,
-                easing: 'easeInOutQuad'
-            });
-            anime({
-                targets: authorElement,
-                opacity: [0, 1],
-                duration: 1000,
-                easing: 'easeInOutQuad'
-            });
+            const quote = data[0].q;
+            const author = data[0].a;
+            document.getElementById('today-quote').textContent = `"${quote}"`;
+            document.getElementById('today-author').textContent = `— ${author}`;
+            localStorage.setItem('quoteDate', today);
+            localStorage.setItem('todayQuote', quote);
+            localStorage.setItem('todayAuthor', author);
         })
         .catch(error => {
             document.getElementById('today-quote').textContent = 'Failed to load quote.';
             console.error(error);
         });
-});
-
-// 지난 명언 슬라이드
-const swiper = new Swiper('.swiper-container', {
-    direction: 'vertical',
-    loop: true,
-    autoplay: {
-        delay: 20000,
-        disableOnInteraction: false
-    },
-    slidesPerView: 1,
-    spaceBetween: 20
-});
-
-for (let i = 0; i < 5; i++) {
-    fetch('https://api.quotable.io/random?maxLength=45')
-        .then(response => response.json())
-        .then(data => {
-            const slide = document.createElement('div');
-            slide.classList.add('swiper-slide');
-            slide.innerHTML = `
-                <p class="text-xl">"${data.content}"</p>
-                <p class="text-gray-600 italic">— ${data.author}</p>
-                <div class="sharethis-inline-share-buttons mt-4"></div>
-            `;
-            document.getElementById('past-quotes').appendChild(slide);
-            swiper.update();
-        })
-        .catch(error => console.error(error));
 }
+loadTodayQuote();
 
 // 랜덤 명언
 let randomCount = 0;
 const maxFreeQuotes = 5;
-let selectedCategory = 'all';
-
-document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('bg-blue-500', 'text-white'));
-        btn.classList.add('bg-blue-500', 'text-white');
-        selectedCategory = btn.dataset.category;
-    });
-});
 
 document.getElementById('random-quote-btn').addEventListener('click', () => {
     if (randomCount >= maxFreeQuotes) {
         document.getElementById('random-limit-message').classList.remove('hidden');
-        document.getElementById('unlimited-btn').classList.remove('hidden');
         return;
     }
 
     randomCount++;
     document.getElementById('random-limit-message').classList.add('hidden');
-    document.getElementById('unlimited-btn').classList.add('hidden');
     document.getElementById('random-quote-box').classList.remove('hidden');
 
-    const url = selectedCategory === 'all' ? 'https://api.quotable.io/random?maxLength=45' : `https://api.quotable.io/random?maxLength=45&tags=${selectedCategory}`;
-    fetch(url)
+    fetch('https://zenquotes.io/api/random')
         .then(response => response.json())
         .then(data => {
-            const quoteElement = document.getElementById('random-quote');
-            const authorElement = document.getElementById('random-author');
-            quoteElement.textContent = `"${data.content}"`;
-            authorElement.textContent = `— ${data.author}`;
+            const quote = data[0].q;
+            const author = data[0].a;
+            document.getElementById('random-quote').textContent = `"${quote}"`;
+            document.getElementById('random-author').textContent = `— ${author}`;
             anime({
-                targets: quoteElement,
-                opacity: [0, 1],
-                duration: 1000,
-                easing: 'easeInOutQuad'
-            });
-            anime({
-                targets: authorElement,
+                targets: '#random-quote, #random-author',
                 opacity: [0, 1],
                 duration: 1000,
                 easing: 'easeInOutQuad'
@@ -165,27 +106,41 @@ document.getElementById('random-quote-btn').addEventListener('click', () => {
         });
 });
 
-// 프리미엄 기능 링크
-document.getElementById('save-quote-btn').addEventListener('click', () => {
-    window.open('https://gumroad.com/l/premium-access', '_blank');
+// 지난 명언 (하드코딩)
+const pastQuotes = [
+    "Life is what happens when you're busy making other plans. — John Lennon",
+    "The only way to do great work is to love what you do. — Steve Jobs",
+    "In the middle of difficulty lies opportunity. — Albert Einstein",
+    "Be the change that you wish to see in the world. — Mahatma Gandhi",
+    "To be yourself in a world that is constantly trying to make you something else is the greatest accomplishment. — Ralph Waldo Emerson",
+    "The best way to predict the future is to create it. — Peter Drucker",
+    "Success is not final, failure is not fatal: It is the courage to continue that counts. — Winston Churchill",
+    "It does not matter how slowly you go as long as you do not stop. — Confucius",
+    "The only limit to our realization of tomorrow will be our doubts of today. — Franklin D. Roosevelt",
+    "You miss 100% of the shots you don’t take. — Wayne Gretzky",
+    "I have not failed. I've just found 10,000 ways that won't work. — Thomas Edison",
+    "The greatest glory in living lies not in never falling, but in rising every time we fall. — Nelson Mandela",
+    "Do what you can, with what you have, where you are. — Theodore Roosevelt",
+    "Everything you’ve ever wanted is on the other side of fear. — George Addair",
+    "It is never too late to be what you might have been. — George Eliot",
+    "What we think, we become. — Buddha",
+    "Happiness is not something ready-made. It comes from your own actions. — Dalai Lama",
+    "The journey of a thousand miles begins with one step. — Lao Tzu",
+    "You must be the change you wish to see in the world. — Mahatma Gandhi",
+    "Life is either a daring adventure or nothing at all. — Helen Keller"
+];
+
+const pastQuotesContainer = document.getElementById('past-quotes');
+pastQuotes.forEach(quote => {
+    const quoteCard = document.createElement('div');
+    quoteCard.classList.add('bg-gray-200', 'text-gray-800', 'font-semibold', 'py-4', 'px-6', 'rounded-lg');
+    quoteCard.textContent = quote;
+    pastQuotesContainer.appendChild(quoteCard);
 });
 
-document.getElementById('download-image-btn').addEventListener('click', () => {
-    window.open('https://gumroad.com/l/quote-image', '_blank');
-});
-
-document.getElementById('unlimited-btn').addEventListener('click', () => {
-    window.open('https://gumroad.com/l/premium-access', '_blank');
-});
-
-// 테마 변경 (프리미엄)
+// 테마 변경
 document.getElementById('theme-select').addEventListener('change', (e) => {
-    const value = e.target.value;
-    if (value !== 'default') {
-        alert('Premium feature! Subscribe for $1.98/mo.');
-        window.open('https://gumroad.com/l/premium-access', '_blank');
-        e.target.value = 'default';
-    }
+    document.body.className = `min-h-screen text-gray-800 ${e.target.value}`;
 });
 
 // EmailJS
